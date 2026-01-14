@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchCountries } from "./countryService";
+
 
 function RegistrationForm() {
+  const [countries, setCountries] = useState([]);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    country: "",
     countryCode: "91",
     phone: "",
     gender: "",
     workShift: []
   });
+
+  // Fetch countries on load
+  useEffect(() => {
+    fetchCountries()
+      .then((data) => setCountries(data))
+      .catch((err) => console.error("Country API error:", err));
+  }, []);
 
   // Handle input change
   const handleChange = (e) => {
@@ -41,6 +53,7 @@ function RegistrationForm() {
     setFormData({
       name: "",
       email: "",
+      country: "",
       countryCode: "91",
       phone: "",
       gender: "",
@@ -81,6 +94,25 @@ function RegistrationForm() {
                     onChange={handleChange}
                     required
                   />
+                </div>
+
+                {/* Country Dropdown */}
+                <div className="mb-3">
+                  <label className="form-label">Country</label>
+                  <select
+                    className="form-select"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Country</option>
+                    {countries.map((item, index) => (
+                      <option key={index} value={item.country}>
+                        {item.country}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Phone */}
@@ -146,8 +178,8 @@ function RegistrationForm() {
                 <button className="btn btn-primary w-100" type="submit">
                   Register
                 </button>
-
               </form>
+
             </div>
           </div>
         </div>
