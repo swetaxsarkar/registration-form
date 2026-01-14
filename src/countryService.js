@@ -3,5 +3,5 @@ export const fetchCountries = async () => {
     "https://countriesnow.space/api/v0.1/countries"
   );
   const data = await response.json();
-  return data.data; // only country list
+  return data.data;
 };

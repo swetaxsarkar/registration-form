@@ -1,34 +1,41 @@
 import { useEffect, useState } from "react";
-import { fetchCountries } from "./countryService";
-
+import Select from "react-select";
 
 function RegistrationForm() {
-  const [countries, setCountries] = useState([]);
-
+ 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    country: "",
     countryCode: "91",
     phone: "",
     gender: "",
     workShift: []
   });
 
-  // Fetch countries on load
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [cities, setCities] = useState([]);
+  const [selectedCities, setSelectedCities] = useState([]);
+
   useEffect(() => {
-    fetchCountries()
-      .then((data) => setCountries(data))
-      .catch((err) => console.error("Country API error:", err));
+    fetch("https://countriesnow.space/api/v0.1/countries")
+      .then((res) => res.json())
+      .then((data) => {
+        const countryOptions = data.data.map((item) => ({
+          label: item.country,
+          value: item.country,
+          cities: item.cities
+        }));
+        setCountries(countryOptions);
+      })
+      .catch((err) => console.error("Country API Error:", err));
   }, []);
 
-  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle checkbox change
   const handleShiftChange = (e) => {
     const { value, checked } = e.target;
 
@@ -36,16 +43,33 @@ function RegistrationForm() {
       ...prev,
       workShift: checked
         ? [...prev.workShift, value]
-        : prev.workShift.filter((shift) => shift !== value)
+        : prev.workShift.filter((s) => s !== value)
     }));
   };
 
-  // Submit form
+  const handleCountryChange = (country) => {
+    setSelectedCountry(country);
+
+    const cityOptions = country.cities.map((city) => ({
+      label: city,
+      value: city
+    }));
+
+    setCities(cityOptions);
+    setSelectedCities([]); 
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const finalData = {
+      ...formData,
+      country: selectedCountry?.value,
+      cities: selectedCities.map((c) => c.value)
+    };
+
     const users = JSON.parse(localStorage.getItem("users")) || [];
-    users.push(formData);
+    users.push(finalData);
     localStorage.setItem("users", JSON.stringify(users));
 
     alert("Registration Successful!");
@@ -53,12 +77,14 @@ function RegistrationForm() {
     setFormData({
       name: "",
       email: "",
-      country: "",
       countryCode: "91",
       phone: "",
       gender: "",
       workShift: []
     });
+    setSelectedCountry(null);
+    setCities([]);
+    setSelectedCities([]);
   };
 
   return (
@@ -94,25 +120,6 @@ function RegistrationForm() {
                     onChange={handleChange}
                     required
                   />
-                </div>
-
-                {/* Country Dropdown */}
-                <div className="mb-3">
-                  <label className="form-label">Country</label>
-                  <select
-                    className="form-select"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Country</option>
-                    {countries.map((item, index) => (
-                      <option key={index} value={item.country}>
-                        {item.country}
-                      </option>
-                    ))}
-                  </select>
                 </div>
 
                 {/* Phone */}
@@ -173,6 +180,34 @@ function RegistrationForm() {
                       <label className="form-check-label">{shift}</label>
                     </div>
                   ))}
+                </div>
+
+                {/* Country */}
+                <div className="mb-3">
+                  <label className="form-label">Country</label>
+                  <Select
+                    options={countries}
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                    placeholder="Select Country"
+                  />
+                </div>
+
+                {/* City */}
+                <div className="mb-3">
+                  <label className="form-label">City</label>
+                  <Select
+                    options={cities}
+                    value={selectedCities}
+                    onChange={setSelectedCities}
+                    isMulti
+                    isDisabled={!selectedCountry}
+                    placeholder={
+                      selectedCountry
+                        ? "Select City"
+                        : "Select country first"
+                    }
+                  />
                 </div>
 
                 <button className="btn btn-primary w-100" type="submit">
