@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 function RegistrationForm() {
-  // ---------------- BASIC FORM STATE ----------------
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -12,18 +12,15 @@ function RegistrationForm() {
     workShift: []
   });
 
-  // ---------------- COUNTRY / CITY STATE ----------------
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [cities, setCities] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
 
-  // ---------------- QUALIFICATION STATE ----------------
   const [qualifications, setQualifications] = useState([
     { degreeName: "", passingYear: 1900 }
   ]);
 
-  // ---------------- FETCH COUNTRY API ----------------
   useEffect(() => {
     fetch("https://countriesnow.space/api/v0.1/countries")
       .then((res) => res.json())
@@ -38,7 +35,6 @@ function RegistrationForm() {
       .catch((err) => console.error("Country API Error:", err));
   }, []);
 
-  // ---------------- HANDLERS ----------------
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -64,7 +60,7 @@ function RegistrationForm() {
     setSelectedCities([]);
   };
 
-  // ---------------- QUALIFICATION HANDLERS ----------------
+ 
   const handleQualificationChange = (index, field, value) => {
     const updated = [...qualifications];
     updated[index][field] = value;
@@ -82,7 +78,6 @@ function RegistrationForm() {
     setQualifications(qualifications.filter((_, i) => i !== index));
   };
 
-  // ---------------- SUBMIT ----------------
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -113,7 +108,6 @@ function RegistrationForm() {
     setQualifications([{ degreeName: "", passingYear: 1900 }]);
   };
 
-  // ---------------- JSX ----------------
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
