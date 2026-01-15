@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 function RegistrationForm() {
- 
+  // ---------------- BASIC FORM STATE ----------------
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -12,11 +12,18 @@ function RegistrationForm() {
     workShift: []
   });
 
+  // ---------------- COUNTRY / CITY STATE ----------------
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [cities, setCities] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
 
+  // ---------------- QUALIFICATION STATE ----------------
+  const [qualifications, setQualifications] = useState([
+    { degreeName: "", passingYear: 1900 }
+  ]);
+
+  // ---------------- FETCH COUNTRY API ----------------
   useEffect(() => {
     fetch("https://countriesnow.space/api/v0.1/countries")
       .then((res) => res.json())
@@ -31,6 +38,7 @@ function RegistrationForm() {
       .catch((err) => console.error("Country API Error:", err));
   }, []);
 
+  // ---------------- HANDLERS ----------------
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -38,7 +46,6 @@ function RegistrationForm() {
 
   const handleShiftChange = (e) => {
     const { value, checked } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       workShift: checked
@@ -49,23 +56,41 @@ function RegistrationForm() {
 
   const handleCountryChange = (country) => {
     setSelectedCountry(country);
-
     const cityOptions = country.cities.map((city) => ({
       label: city,
       value: city
     }));
-
     setCities(cityOptions);
-    setSelectedCities([]); 
+    setSelectedCities([]);
   };
 
+  // ---------------- QUALIFICATION HANDLERS ----------------
+  const handleQualificationChange = (index, field, value) => {
+    const updated = [...qualifications];
+    updated[index][field] = value;
+    setQualifications(updated);
+  };
+
+  const addQualification = () => {
+    setQualifications([
+      ...qualifications,
+      { degreeName: "", passingYear: 1900 }
+    ]);
+  };
+
+  const removeQualification = (index) => {
+    setQualifications(qualifications.filter((_, i) => i !== index));
+  };
+
+  // ---------------- SUBMIT ----------------
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const finalData = {
       ...formData,
       country: selectedCountry?.value,
-      cities: selectedCities.map((c) => c.value)
+      cities: selectedCities.map((c) => c.value),
+      qualifications
     };
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -85,8 +110,10 @@ function RegistrationForm() {
     setSelectedCountry(null);
     setCities([]);
     setSelectedCities([]);
+    setQualifications([{ degreeName: "", passingYear: 1900 }]);
   };
 
+  // ---------------- JSX ----------------
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
@@ -208,6 +235,71 @@ function RegistrationForm() {
                         : "Select country first"
                     }
                   />
+                </div>
+
+                {/* Qualifications */}
+                <div className="mb-3">
+                  <label className="form-label fw-bold">Qualifications</label>
+
+                  {qualifications.map((q, index) => (
+                    <div className="row mb-2" key={index}>
+                      <div className="col-md-6">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Degree Name"
+                          value={q.degreeName}
+                          onChange={(e) =>
+                            handleQualificationChange(
+                              index,
+                              "degreeName",
+                              e.target.value
+                            )
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div className="col-md-4">
+                        <input
+                          type="number"
+                          className="form-control"
+                          placeholder="Passing Year"
+                          min="1900"
+                          max={new Date().getFullYear()}
+                          value={q.passingYear}
+                          onChange={(e) =>
+                            handleQualificationChange(
+                              index,
+                              "passingYear",
+                              e.target.value
+                            )
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div className="col-md-2">
+                        {qualifications.length > 1 && (
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={() => removeQualification(index)}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary mt-2"
+                    onClick={addQualification}
+                  >
+                    + Add Qualification
+                  </button>
                 </div>
 
                 <button className="btn btn-primary w-100" type="submit">
