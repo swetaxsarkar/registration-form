@@ -3,26 +3,24 @@ import { questions } from "../data/questions";
 
 function QuizApp() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [score, setScore] = useState(0);
+
+  // store all selected answers
+  const [answers, setAnswers] = useState(Array(questions.length).fill(null));
+
   const [isFinished, setIsFinished] = useState(false);
 
   const currentQuestion = questions[currentIndex];
 
+  // select option
+  const handleSelectOption = (optionIndex) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = optionIndex;
+    setAnswers(updatedAnswers);
+  };
+
+  // next question
   const handleNext = () => {
-    if (selectedOption === null) return;
-
-    let updatedScore = score;
-
-    if (selectedOption === currentQuestion.correctAnswer) {
-      updatedScore += 2;
-    } else {
-      updatedScore -= 1;
-      if (updatedScore < 0) updatedScore = 0;
-    }
-
-    setScore(updatedScore);
-    setSelectedOption(null);
+    if (answers[currentIndex] === null) return;
 
     if (currentIndex === questions.length - 1) {
       setIsFinished(true);
@@ -31,10 +29,35 @@ function QuizApp() {
     }
   };
 
+  // back question (boss new requirement)
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  // calculate score at end
+  const calculateScore = () => {
+    let score = 0;
+
+    answers.forEach((ans, index) => {
+      if (ans === null) return;
+
+      if (ans === questions[index].correctAnswer) {
+        score += 2;
+      } else {
+        score -= 1;
+        if (score < 0) score = 0;
+      }
+    });
+
+    return score;
+  };
+
+  // restart quiz
   const handleRestart = () => {
     setCurrentIndex(0);
-    setSelectedOption(null);
-    setScore(0);
+    setAnswers(Array(questions.length).fill(null));
     setIsFinished(false);
   };
 
@@ -49,6 +72,7 @@ function QuizApp() {
               <h5>
                 Question {currentIndex + 1} / {questions.length}
               </h5>
+
               <p className="fw-bold">{currentQuestion.question}</p>
 
               {currentQuestion.options.map((opt, index) => (
@@ -56,28 +80,39 @@ function QuizApp() {
                   <input
                     className="form-check-input"
                     type="radio"
-                    name="option"
-                    checked={selectedOption === index}
-                    onChange={() => setSelectedOption(index)}
+                    name={`question-${currentIndex}`}
+                    checked={answers[currentIndex] === index}
+                    onChange={() => handleSelectOption(index)}
                   />
                   <label className="form-check-label">{opt}</label>
                 </div>
               ))}
 
-              <button
-                className="btn btn-primary mt-3"
-                onClick={handleNext}
-                disabled={selectedOption === null}
-              >
-                {currentIndex === questions.length - 1 ? "Finish" : "Next"}
-              </button>
+              <div className="d-flex gap-2 mt-3">
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleBack}
+                  disabled={currentIndex === 0}
+                >
+                  Back
+                </button>
 
-              <p className="mt-3 fw-bold">Score: {score}</p>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleNext}
+                  disabled={answers[currentIndex] === null}
+                >
+                  {currentIndex === questions.length - 1 ? "Finish" : "Next"}
+                </button>
+              </div>
             </>
           ) : (
             <>
               <h4 className="text-center">Quiz Finished 🎉</h4>
-              <p className="text-center fw-bold">Final Score: {score}</p>
+              <p className="text-center fw-bold">
+                Final Score: {calculateScore()}
+              </p>
+
               <button className="btn btn-success w-100" onClick={handleRestart}>
                 Restart Quiz
               </button>
