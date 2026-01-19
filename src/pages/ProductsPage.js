@@ -6,9 +6,8 @@ function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const PRODUCTS_PER_PAGE = 8;
+  // ✅ Load More paging
+  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     axios
@@ -23,20 +22,8 @@ function ProductsPage() {
       });
   }, []);
 
-  // ✅ Pagination calculations
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const endIndex = startIndex + PRODUCTS_PER_PAGE;
-  const currentProducts = products.slice(startIndex, endIndex);
-
-  const handlePrev = () => {
-    setCurrentPage((prev) => prev - 1);
-    window.scrollTo(0, 0);
-  };
-
-  const handleNext = () => {
-    setCurrentPage((prev) => prev + 1);
-    window.scrollTo(0, 0);
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 8);
   };
 
   if (loading) {
@@ -53,34 +40,22 @@ function ProductsPage() {
 
       {/* ✅ Products Grid */}
       <div className="row g-4">
-        {currentProducts.map((product) => (
+        {products.slice(0, visibleCount).map((product) => (
           <div className="col-md-3" key={product.id}>
             <ProductCard product={product} />
           </div>
         ))}
       </div>
 
-      {/* ✅ Pagination Buttons */}
-      <div className="d-flex justify-content-center align-items-center gap-3 mt-4 mb-4">
-        <button
-          className="btn btn-secondary"
-          onClick={handlePrev}
-          disabled={currentPage === 1}
-        >
-          Prev
-        </button>
-
-        <span className="fw-bold">
-          Page {currentPage} of {totalPages}
-        </span>
-
-        <button
-          className="btn btn-secondary"
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+      {/* ✅ Load More Button */}
+      <div className="text-center mt-4 mb-4">
+        {visibleCount < products.length ? (
+          <button className="btn btn-primary" onClick={handleLoadMore}>
+            Load More
+          </button>
+        ) : (
+          <p className="fw-bold text-success">✅ All products loaded</p>
+        )}
       </div>
     </div>
   );
