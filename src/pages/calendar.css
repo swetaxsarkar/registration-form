@@ -1,0 +1,44 @@
+/* remove extra spacing around calendar */
+.rbc-calendar {
+  font-family: Arial, sans-serif;
+}
+
+/* top header style (January 2026 + arrows + today) */
+.rbc-toolbar {
+  padding: 10px 14px;
+  margin-bottom: 0px;
+}
+
+/* remove view buttons line completely */
+.rbc-toolbar .rbc-btn-group:last-child {
+  display: none !important;
+}
+
+/* month cell border like the image */
+.rbc-month-view {
+  border: 1px solid #ddd;
+}
+
+.rbc-day-bg {
+  border-right: 1px solid #eee;
+}
+
+/* make event bars look flat like screenshot */
+.rbc-event {
+  box-shadow: none !important;
+}
+
+.rbc-event-label {
+  display: none !important; /* hide time label */
+}
+
+.rbc-event-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* make today highlight subtle */
+.rbc-today {
+  background: #f7fbff !important;
+}

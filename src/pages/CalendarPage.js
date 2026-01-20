@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
+import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./calendar.css";
+
+
+import { calendarEvents } from "../data/calendarEvents";
 
 const locales = {
-  "en-US": require("date-fns/locale/en-US")
+  "en-US": enUS
 };
 
 const localizer = dateFnsLocalizer({
@@ -16,47 +21,43 @@ const localizer = dateFnsLocalizer({
 });
 
 function CalendarPage() {
-  const [events, setEvents] = useState([
-    {
-      title: "Team Meeting",
-      start: new Date(),
-      end: new Date(new Date().getTime() + 60 * 60 * 1000)
-    },
-    {
-      title: "Project Deadline",
-      start: new Date(2026, 0, 25, 10, 0),
-      end: new Date(2026, 0, 25, 12, 0)
-    }
-  ]);
-
-  const handleSelectSlot = ({ start, end }) => {
-    const title = prompt("Enter Event Title:");
-    if (title) {
-      setEvents([...events, { title, start, end }]);
-    }
-  };
+  const events = useMemo(() => {
+    return calendarEvents.map((event) => ({
+      ...event,
+      start: new Date(event.start),
+      end: new Date(event.end)
+    }));
+  }, []);
 
   return (
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">Event Calendar</h2>
-
-      <div className="card shadow">
-        <div className="card-body">
+    <div className="container-fluid mt-3 px-3">
+      <div className="card shadow-sm">
+        <div className="card-body p-0">
           <Calendar
             localizer={localizer}
             events={events}
             startAccessor="start"
             endAccessor="end"
-            style={{ height: 500 }}
-            selectable
-            onSelectSlot={handleSelectSlot}
+            defaultView="month"
+            views={["month"]}                 // ✅ remove extra buttons
+            toolbar={true}                    // ✅ keep top toolbar (Jan 2026 + Today + arrows)
+            popup={false}                     // ✅ avoid popup extra UI
+            style={{ height: "88vh" }}         // ✅ full big calendar like screenshot
+            defaultDate={new Date("2026-01-01")} // ✅ open January 2026
+            eventPropGetter={(event) => ({
+              style: {
+                backgroundColor: event.color,
+                borderRadius: "2px",
+                color: "#111",
+                border: "none",
+                paddingLeft: "6px",
+                fontSize: "12px",
+                fontWeight: "500"
+              }
+            })}
           />
         </div>
       </div>
-
-      <p className="text-muted mt-3 text-center">
-        ✅ Click and drag on calendar to add a new event
-      </p>
     </div>
   );
 }
