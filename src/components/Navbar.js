@@ -27,6 +27,10 @@ function Navbar() {
         <NavLink className="nav-link" to="/quiz">
           Quiz
         </NavLink>
+        <NavLink className="nav-link" to="/calendar">
+  Calendar
+</NavLink>
+
       </div>
 
       <div className="d-flex">

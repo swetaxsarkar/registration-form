@@ -6,6 +6,8 @@ import ProductsPage from "./pages/ProductsPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
+import CalendarPage from "./pages/CalendarPage";
+
 
 function App() {
   return (
@@ -37,6 +39,15 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+  path="/calendar"
+  element={
+    <PrivateRoute>
+      <CalendarPage />
+    </PrivateRoute>
+  }
+/>
+
       </Routes>
     </BrowserRouter>
   );
