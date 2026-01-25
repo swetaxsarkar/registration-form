@@ -7,6 +7,7 @@ import ProductDetailsPage from "./pages/ProductDetailsPage";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
 import CalendarPage from "./pages/CalendarPage";
+import CovidChartPage from "./pages/CovidChartPage";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             </PrivateRoute>
           }
         />
+<Route path="/covid-chart" element={<CovidChartPage />} />
 
         <Route
           path="/products/:id"
@@ -50,7 +52,9 @@ function App() {
 
       </Routes>
     </BrowserRouter>
+    
   );
+
 }
 
 export default App;

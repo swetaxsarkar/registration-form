@@ -30,6 +30,9 @@ function Navbar() {
         <NavLink className="nav-link" to="/calendar">
   Calendar
 </NavLink>
+<NavLink className="nav-link" to="/covid-chart">
+  Covid Chart
+</NavLink>
 
       </div>
 
