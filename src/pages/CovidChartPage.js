@@ -37,20 +37,33 @@ function CovidChartPage() {
 
         const labels = Object.keys(casesObj);
 
+        const getDailyData = (dataObj) => {
+          const values = Object.values(dataObj);
+          return values.map((value, index) =>
+            index === 0 ? 0 : value - values[index - 1]
+          );
+        };
+
         setChartData({
-          labels: labels,
+          labels,
           datasets: [
             {
-              label: "Cases",
-              data: Object.values(casesObj)
+              label: "Daily Cases",
+              data: getDailyData(casesObj),
+              borderColor: "blue",
+              backgroundColor: "blue"
             },
             {
-              label: "Deaths",
-              data: Object.values(deathsObj)
+              label: "Daily Deaths",
+              data: getDailyData(deathsObj),
+              borderColor: "red",
+              backgroundColor: "red"
             },
             {
-              label: "Recovered",
-              data: Object.values(recoveredObj)
+              label: "Daily Recovered",
+              data: getDailyData(recoveredObj),
+              borderColor: "green",
+              backgroundColor: "green"
             }
           ]
         });
@@ -58,7 +71,7 @@ function CovidChartPage() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log("Covid API error:", err);
+        console.error("Covid API error:", err);
         setLoading(false);
       });
   }, []);
@@ -71,17 +84,11 @@ function CovidChartPage() {
     );
   }
 
-  if (!chartData) {
-    return (
-      <div className="container mt-5 text-center">
-        <h4>Chart Data not available</h4>
-      </div>
-    );
-  }
-
   return (
     <div className="container mt-4">
-      <h2 className="text-center mb-4">COVID-19 Last 10 Days Chart</h2>
+      <h2 className="text-center mb-4">
+        COVID-19 Daily Change (Last 10 Days)
+      </h2>
 
       <div className="card shadow">
         <div className="card-body">
@@ -93,7 +100,12 @@ function CovidChartPage() {
                 legend: { position: "top" },
                 title: {
                   display: true,
-                  text: "Global COVID Cases/Deaths/Recovered"
+                  text: "Global COVID Daily Trends"
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true
                 }
               }
             }}
