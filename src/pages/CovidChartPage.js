@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -16,8 +15,7 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -33,7 +31,6 @@ function CovidChartPage() {
       .then((res) => {
         const casesObj = res.data.cases;
         const deathsObj = res.data.deaths;
-        const recoveredObj = res.data.recovered;
 
         const labels = Object.keys(casesObj);
 
@@ -50,20 +47,12 @@ function CovidChartPage() {
             {
               label: "Daily Cases",
               data: getDailyData(casesObj),
-              borderColor: "blue",
-              backgroundColor: "blue"
+              backgroundColor: "#4e79a7"
             },
             {
               label: "Daily Deaths",
               data: getDailyData(deathsObj),
-              borderColor: "red",
-              backgroundColor: "red"
-            },
-            {
-              label: "Daily Recovered",
-              data: getDailyData(recoveredObj),
-              borderColor: "green",
-              backgroundColor: "green"
+              backgroundColor: "#e15759"
             }
           ]
         });
@@ -87,12 +76,12 @@ function CovidChartPage() {
   return (
     <div className="container mt-4">
       <h2 className="text-center mb-4">
-        COVID-19 Daily Change (Last 10 Days)
+        COVID-19 Daily Bar Chart (Last 10 Days)
       </h2>
 
       <div className="card shadow">
         <div className="card-body">
-          <Line
+          <Bar
             data={chartData}
             options={{
               responsive: true,
@@ -100,7 +89,7 @@ function CovidChartPage() {
                 legend: { position: "top" },
                 title: {
                   display: true,
-                  text: "Global COVID Daily Trends"
+                  text: "Global COVID Daily Cases & Deaths"
                 }
               },
               scales: {
