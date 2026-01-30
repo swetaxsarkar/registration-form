@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import RegistrationPage from "./pages/RegistrationPage";
+import RegistrationList from "./pages/RegistrationList";
 import QuizPage from "./pages/QuizPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
@@ -8,7 +9,6 @@ import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
 import CalendarPage from "./pages/CalendarPage";
 import CovidChartPage from "./pages/CovidChartPage";
-
 
 function App() {
   return (
@@ -18,11 +18,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/registration" />} />
 
+        {/* Public Routes */}
         <Route path="/registration" element={<RegistrationPage />} />
+        <Route path="/registration-list" element={<RegistrationList />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/covid-chart" element={<CovidChartPage />} />
 
-        {/* ✅ Protected Routes */}
+        {/* Protected Routes */}
         <Route
           path="/quiz"
           element={
@@ -31,7 +34,6 @@ function App() {
             </PrivateRoute>
           }
         />
-<Route path="/covid-chart" element={<CovidChartPage />} />
 
         <Route
           path="/products/:id"
@@ -41,20 +43,18 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-  path="/calendar"
-  element={
-    <PrivateRoute>
-      <CalendarPage />
-    </PrivateRoute>
-  }
-/>
 
+        <Route
+          path="/calendar"
+          element={
+            <PrivateRoute>
+              <CalendarPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
-    
   );
-
 }
 
 export default App;

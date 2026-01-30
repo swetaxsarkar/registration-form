@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 function RegistrationForm() {
-  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,6 +20,7 @@ function RegistrationForm() {
     { degreeName: "", passingYear: 1900 }
   ]);
 
+  // 🔹 Fetch countries
   useEffect(() => {
     fetch("https://countriesnow.space/api/v0.1/countries")
       .then((res) => res.json())
@@ -32,7 +32,25 @@ function RegistrationForm() {
         }));
         setCountries(countryOptions);
       })
-      .catch((err) => console.error("Country API Error:", err));
+      .catch((err) => console.error("Country API error:", err));
+  }, []);
+
+  // 🔹 Prefill form on Edit
+  useEffect(() => {
+    const editData = JSON.parse(localStorage.getItem("editData"));
+
+    if (editData) {
+      setFormData({
+        name: editData.name,
+        email: editData.email,
+        countryCode: editData.phone.split(" ")[0].replace("+", ""),
+        phone: editData.phone.split(" ")[1],
+        gender: editData.gender,
+        workShift: editData.workShift || []
+      });
+
+      setQualifications(editData.qualifications || []);
+    }
   }, []);
 
   const handleChange = (e) => {
@@ -60,7 +78,6 @@ function RegistrationForm() {
     setSelectedCities([]);
   };
 
- 
   const handleQualificationChange = (index, field, value) => {
     const updated = [...qualifications];
     updated[index][field] = value;
@@ -78,22 +95,53 @@ function RegistrationForm() {
     setQualifications(qualifications.filter((_, i) => i !== index));
   };
 
+  // 🔹 SUBMIT (ADD + EDIT)
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("SUBMIT CLICKED");
 
     const finalData = {
-      ...formData,
-      country: selectedCountry?.value,
-      cities: selectedCities.map((c) => c.value),
+      id: Date.now(),
+      name: formData.name,
+      email: formData.email,
+      phone: `+${formData.countryCode} ${formData.phone}`,
+      gender: formData.gender,
+      workShift: formData.workShift,
+      country: selectedCountry?.value || "",
+      city: selectedCities.map((c) => c.value).join(", "),
       qualifications
     };
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    users.push(finalData);
-    localStorage.setItem("users", JSON.stringify(users));
+    console.log("FINAL DATA:", finalData);
+
+    const existing =
+      JSON.parse(localStorage.getItem("registrations")) || [];
+
+    const editData = JSON.parse(localStorage.getItem("editData"));
+
+    let updatedData;
+    if (editData) {
+      updatedData = existing.map((item) =>
+        item.id === editData.id ? { ...finalData, id: editData.id } : item
+      );
+      localStorage.removeItem("editData");
+    } else {
+      updatedData = [...existing, finalData];
+    }
+
+    localStorage.setItem(
+      "registrations",
+      JSON.stringify(updatedData)
+    );
+
+    console.log(
+      "AFTER SAVE:",
+      JSON.parse(localStorage.getItem("registrations"))
+    );
 
     alert("Registration Successful!");
 
+    // reset form
     setFormData({
       name: "",
       email: "",
@@ -116,7 +164,8 @@ function RegistrationForm() {
             <div className="card-body">
               <h3 className="text-center mb-4">Registration Form</h3>
 
-              <form onSubmit={handleSubmit}>
+              {/* 🔴 noValidate IS CRITICAL */}
+              <form onSubmit={handleSubmit} noValidate>
                 {/* Name */}
                 <div className="mb-3">
                   <label className="form-label">Name</label>
@@ -151,7 +200,7 @@ function RegistrationForm() {
                     <input
                       type="text"
                       name="countryCode"
-                      className="form-control flex-grow-0"
+                      className="form-control"
                       style={{ maxWidth: "70px" }}
                       value={formData.countryCode}
                       onChange={handleChange}
