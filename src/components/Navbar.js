@@ -24,16 +24,22 @@ function Navbar() {
           Products
         </NavLink>
 
+        {/* ✅ ADDED CART LINK (STEP 6) */}
+        <NavLink className="nav-link" to="/cart">
+          Cart
+        </NavLink>
+
         <NavLink className="nav-link" to="/quiz">
           Quiz
         </NavLink>
-        <NavLink className="nav-link" to="/calendar">
-  Calendar
-</NavLink>
-<NavLink className="nav-link" to="/covid-chart">
-  Covid Chart
-</NavLink>
 
+        <NavLink className="nav-link" to="/calendar">
+          Calendar
+        </NavLink>
+
+        <NavLink className="nav-link" to="/covid-chart">
+          Covid Chart
+        </NavLink>
       </div>
 
       <div className="d-flex">

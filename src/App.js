@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
+
 import RegistrationPage from "./pages/RegistrationPage";
 import RegistrationList from "./pages/RegistrationList";
 import QuizPage from "./pages/QuizPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
+import CartPage from "./pages/CartPage";          // ✅ STEP 5
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
 import CalendarPage from "./pages/CalendarPage";
@@ -22,6 +24,7 @@ function App() {
         <Route path="/registration" element={<RegistrationPage />} />
         <Route path="/registration-list" element={<RegistrationList />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/cart" element={<CartPage />} />        {/* ✅ STEP 5 */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/covid-chart" element={<CovidChartPage />} />
 

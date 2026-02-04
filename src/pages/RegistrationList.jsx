@@ -1,89 +1,105 @@
 import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import RegistrationDataGrid from "../components/RegistrationDataGrid";
 
 const RegistrationList = () => {
   const [data, setData] = useState([]);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedData =
+    const stored =
       JSON.parse(localStorage.getItem("registrations")) || [];
-
-    console.log("Registrations from localStorage:", storedData);
-    setData(storedData);
+    setData(stored);
   }, []);
 
-  const handleDelete = (id) => {
-    const updatedData = data.filter(item => item.id !== id);
-    setData(updatedData);
-    localStorage.setItem("registrations", JSON.stringify(updatedData));
-  };
-
-  const handleEdit = (item) => {
-    localStorage.setItem("editData", JSON.stringify(item));
+  const handleEdit = (row) => {
+    localStorage.setItem("editData", JSON.stringify(row));
     navigate("/registration");
   };
 
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this registration?")) return;
+
+    const updated = data.filter(item => item.id !== id);
+    setData(updated);
+    localStorage.setItem("registrations", JSON.stringify(updated));
+  };
+
+  const filtered = data.filter(
+    (item) =>
+      item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.email.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="container mt-4">
-      <h3>Registration List</h3>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: "#f8fafc",
+        minHeight: "100vh"
+      }}
+    >
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          border: "1px solid #e5e7eb"
+        }}
+      >
+        <Box
+          sx={{
+            px: 3,
+            py: 2,
+            borderBottom: "1px solid #e5e7eb",
+            backgroundColor: "#ffffff",
+            borderTopLeftRadius: "16px",
+            borderTopRightRadius: "16px"
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, color: "#111827" }}
+          >
+            Registration List
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "#6b7280", mt: 0.5 }}
+          >
+            Manage registered users and their details
+          </Typography>
+        </Box>
 
-      <table className="table table-bordered table-striped mt-3">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Gender</th>
-            <th>Work Shift</th>
-            <th>Country</th>
-            <th>City</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+        <CardContent>
+          <TextField
+            placeholder="Search users by name or email"
+            size="small"
+            fullWidth
+            sx={{
+              mb: 2,
+              backgroundColor: "#ffffff",
+              borderRadius: "8px"
+            }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-        <tbody>
-          {data.length === 0 ? (
-            <tr>
-              <td colSpan="8" className="text-center">
-                No records found
-              </td>
-            </tr>
-          ) : (
-            data.map((item) => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
-                <td>{item.email}</td>
-                <td>{item.phone}</td>
-                <td>{item.gender}</td>
-                <td>
-                  {Array.isArray(item.workShift)
-                    ? item.workShift.join(", ")
-                    : item.workShift}
-                </td>
-                <td>{item.country}</td>
-                <td>{item.city}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-warning me-2"
-                    onClick={() => handleEdit(item)}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+          <RegistrationDataGrid
+            rows={filtered}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
